@@ -1,7 +1,5 @@
-const fs = require("fs");
-
-function createModelFile(abm) {
-  const { getters, campoTabla, setters, modelPath, atributos, NombreClase } = abm;
+export default function createModelFile(abm) {
+  const { getters, setters, modelPath, atributos, NombreClase } = abm;
   console.log("createModelFile");
   const modelContent = `package ar.com.mbsoft.erp.model.impl;
 
@@ -17,26 +15,17 @@ public class ${NombreClase} extends AbstractPersistentObject{
 
 ${atributos
   .map((a) => {
-    return campoTabla(a);
+    return abm.campoTabla(a);
   })
   .join("\n")}
 
-${getters()}
+${abm.getters()}
 
-${setters()}
+${abm.setters()}
 
 
 }
 
 `;
-
-  fs.writeFile(modelPath + `${NombreClase}.java`, modelContent, (err) => {
-    if (err) {
-      console.error("Error al escribir el archivo:", err);
-    } else {
-      console.log("Archivo escrito correctamente");
-    }
-  });
+  return modelContent;
 }
-
-module.exports = { createModelFile };

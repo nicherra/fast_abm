@@ -1,7 +1,5 @@
-const fs = require("fs");
-
-function createServiceMapperFile(abm) {
-  const { NombreClase, setDto, esClase, get, set, fromDto, getDto, nombreClase, serviceMapperPath, atributos } = abm;
+export default function createServiceMapperFile(abm) {
+  const { NombreClase, set, nombreClase, atributos } = abm;
   console.log("createServiceMapperFile ", nombreClase);
   const mapperServiceContent = `package ar.com.mbsoft.erp.service.impl.mapper;
 
@@ -18,7 +16,12 @@ public class ${NombreClase}ServiceMapper extends AbstractServiceMapper{
             ${NombreClase}Dto ${nombreClase}Dto = new ${NombreClase}Dto();
             ${atributos
               .map((a) => {
-                return setDto(a.name, esClase(a.type) ? createDto(a.name) : get(nombreClase, a.name));
+                return abm.setDto(
+                  a.name,
+                  abm.esClase(a.type)
+                    ? abm.createDto(a.name)
+                    : abm.get(nombreClase, a.name)
+                );
               })
               .join("\n            ")}
             return ${nombreClase}Dto;
@@ -36,7 +39,12 @@ public class ${NombreClase}ServiceMapper extends AbstractServiceMapper{
             }
             ${atributos
               .map((a) => {
-                return set(a.name, esClase(a.type) ? fromDto(a.name) : getDto(nombreClase, a.name));
+                return abm.set(
+                  a.name,
+                  abm.esClase(a.type)
+                    ? abm.fromDto(a.name)
+                    : abm.getDto(nombreClase, a.name)
+                );
               })
               .join("\n            ")}
             return ${nombreClase};
@@ -46,13 +54,5 @@ public class ${NombreClase}ServiceMapper extends AbstractServiceMapper{
 }
 
 `;
-
-  fs.writeFile(serviceMapperPath + `${NombreClase}ServiceMapper.java`, mapperServiceContent, (err) => {
-    if (err) {
-      console.error("Error al escribir el archivo:", err);
-    } else {
-      console.log("Archivo escrito correctamente");
-    }
-  });
+  return mapperServiceContent;
 }
-module.exports = { createServiceMapperFile };

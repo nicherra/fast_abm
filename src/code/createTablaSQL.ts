@@ -1,7 +1,7 @@
-const fs = require("fs");
+import CreadorABM from "./CreadorABM";
 
-function createTablaSQLFile(abm) {
-  const { NombreClase, atributos, nameFieldTabla, getFieldTypeSQL, sqlPath } = abm;
+export default function createTablaSQLFile(abm: CreadorABM) {
+  const { NombreClase, atributos } = abm;
   const atributos_with_FK = [];
   const tableContent = `CREATE TABLE ${NombreClase}(
     nID BIGINT IDENTITY (1, 1) NOT NULL,
@@ -10,15 +10,17 @@ function createTablaSQLFile(abm) {
 	observacion VARCHAR(max) NOT NULL,
 ${atributos
   .map((a) => {
-    if (nameFieldTabla(a).includes("nID")) atributos_with_FK.append(a);
-    return nameFieldTabla(a) + getFieldTypeSQL(a) + !a.nullable ? "NOT NULL" : "" + ",";
+    if (abm.nombreCampoTabla(a).includes("nID")) atributos_with_FK.push(a);
+    return abm.nombreCampoTabla(a) + abm.getFieldTypeSQL(a) + !a.nullable
+      ? "NOT NULL"
+      : "" + ",";
   })
   .join("\n")}
 ${atributos_with_FK
   .map((a) => {
     return (
       "FOREIGN KEY (" +
-      nameFieldTabla(a) +
+      abm.nombreCampoTabla(a) +
       ") REFERENCES " +
       a.name.charAt(0).toUpperCase() +
       a.name.slice(1) +
@@ -28,13 +30,5 @@ ${atributos_with_FK
   .join("\n")}
 )`;
 
-  fs.writeFile(sqlPath + `db-changelog-XXX.sql`, tableContent, (err) => {
-    if (err) {
-      console.error("Error al escribir el archivo:", err);
-    } else {
-      console.log("Archivo escrito correctamente");
-    }
-  });
+  return tableContent;
 }
-
-module.exports = { createTablaSQLFile };

@@ -7,8 +7,8 @@ import createTablaSQLFile from "./createTablaSQL";
 import createPrimefacesFiles from "./createPrimeFaces";
 import createServiceFile from "./createService";
 import createInterfaceServiceFile from "./createInterfaceService";
-import { writeTextFile, BaseDirectory } from "@tauri-apps/plugin-fs";
-import { locale } from "@tauri-apps/plugin-os";
+import { writeTextFile, BaseDirectory, create } from "@tauri-apps/plugin-fs";
+import { debug, info } from "@tauri-apps/plugin-log";
 
 export default class CreadorABM {
   NombreClase;
@@ -32,42 +32,34 @@ export default class CreadorABM {
   decimales;
   tiposTiempo;
   dtoPath;
+  creadoABM: CreadorABM;
+  pathTest;
 
-  constructor(NombreClase, test, atributos) {
+  constructor(rootPath, NombreClase, test, atributos) {
+    this.pathTest = "";
+    this.rootPath = rootPath;
     this.NombreClase = NombreClase; // string
-    this.test = test; // boolean
+    this.test = test; // boGolean
     this.atributos = atributos; // array
-    this.username = locale.toString();
+    this.username = "nicherra"; //locale.toString();
     this.nombreClase =
       NombreClase.charAt(0).toLowerCase() + NombreClase.slice(1);
-    this.rootPath = `C:/Users/${this.username}/IdeaProjects/erp-web/`;
-    this.dtoPath = test
-      ? "test/"
-      : this.rootPath + "src/main/java/ar/com/mbsoft/erp/dto/impl/generated/";
-    this.sqlPath = test
-      ? "test/"
-      : this.rootPath + "src/main/resources/liquibase/sql/";
-    this.changelogPath = test
-      ? "test/"
-      : this.rootPath + "src/main/resources/liquibase/";
-    this.primefacesPath = test
-      ? ""
-      : this.rootPath + "src/main/webapp/faces/" + this.nombreClase + "/";
-    this.servicePath = test
-      ? "test/"
-      : this.rootPath + "src/main/java/ar/com/mbsoft/erp/service/impl/";
-    this.serviceMapperPath = test
-      ? "test/"
-      : this.rootPath + "src/main/java/ar/com/mbsoft/erp/service/impl/mapper/";
-    this.modelPath = test
-      ? "test/"
-      : this.rootPath + "src/main/java/ar/com/mbsoft/erp/model/impl/";
-    this.interfaceServicePath = test
-      ? "test/"
-      : this.rootPath + "src/main/java/ar/com/mbsoft/erp/service/";
-    this.beanPath = test
-      ? "test/"
-      : this.rootPath + "src/main/java/ar/com/mbsoft/erp/bean/impl/";
+    this.dtoPath =
+      this.rootPath + "src/main/java/ar/com/mbsoft/erp/dto/impl/generated/";
+    this.sqlPath = this.rootPath + "src/main/resources/liquibase/sql/";
+    this.changelogPath = this.rootPath + "src/main/resources/liquibase/";
+    this.primefacesPath =
+      this.rootPath + "src/main/webapp/faces/" + this.nombreClase + "/";
+    this.servicePath =
+      this.rootPath + "src/main/java/ar/com/mbsoft/erp/service/impl/";
+    this.serviceMapperPath =
+      this.rootPath + "src/main/java/ar/com/mbsoft/erp/service/impl/mapper/";
+    this.modelPath =
+      this.rootPath + "src/main/java/ar/com/mbsoft/erp/model/impl/";
+    this.interfaceServicePath =
+      this.rootPath + "src/main/java/ar/com/mbsoft/erp/service/";
+    this.beanPath =
+      this.rootPath + "src/main/java/ar/com/mbsoft/erp/bean/impl/";
     this.tiposUsados = [
       "BigDecimal",
       "String",
@@ -121,6 +113,7 @@ export default class CreadorABM {
     ];
     this.decimales = ["BigDecimal", "float", "Float", "double", "Double"];
     this.tiposTiempo = ["Date", "LocalDate", "LocalTime", "LocalDateTime"];
+    this.creadoABM = this;
   }
 
   capitalize(str) {
@@ -190,6 +183,17 @@ export default class CreadorABM {
     return `private ${atributo.type} ${atributo.name};`;
   }
 
+  nombreCampoTabla(atributo): string {
+    console.log("nameFieldTabla \n", atributo);
+    let inicial = "nID";
+    if (this.tiposNumericos.includes(atributo.type)) inicial = "n";
+    if (atributo.type === "String") inicial = "c";
+    if (atributo.type === "Boolean" || atributo.type === "boolean")
+      inicial = "l";
+    if (this.tiposTiempo.includes(atributo.type)) inicial = "t";
+    return inicial + this.capitalize(atributo.name);
+  }
+
   campoTabla(atributo) {
     console.log("Ejecutando campoTabla\n", atributo);
     const notNull = "    @NotNull\n";
@@ -199,12 +203,12 @@ export default class CreadorABM {
       anotation =
         "    " +
         atributo.relacion +
-        `(fetch = FetchType.Lazy)\n    @JoinColumn(name ="${this.nameFieldTabla(
+        `(fetch = FetchType.Lazy)\n    @JoinColumn(name ="${this.nombreCampoTabla(
           atributo
         )}"${atributo.nullable ? "" : ",nullable=false"})\n    `;
     } else {
       console.log("else");
-      anotation = `    @Column(name = "${this.nameFieldTabla(atributo)}" ${
+      anotation = `    @Column(name = "${this.nombreCampoTabla(atributo)}" ${
         atributo.nullable ? "" : ",nullable=false"
       })\n    `;
     }
@@ -215,49 +219,58 @@ export default class CreadorABM {
       "\n"
     );
   }
-
-  nameFieldTabla(atributo) {
-    console.log("nameFieldTabla \n", atributo);
-    let inicial = "nID";
-    if (this.tiposNumericos.includes(atributo.type)) inicial = "n";
-    if (atributo.type === "String") inicial = "c";
-    if (atributo.type === "Boolean" || atributo.type === "boolean")
-      inicial = "l";
-    if (this.tiposTiempo.includes(atributo.type)) inicial = "t";
-    return inicial + this.capitalize(atributo.name);
-  }
-  crearArchivos() {
+  async crearArchivos() {
     console.log("creandoArchivos.....");
-    this.escribirArchivo(
+    await this.escribirArchivo(
       this.beanPath + `${this.NombreClase}Bean.java`,
       createBeanFile(this)
     );
-    this.escribirArchivo(
+    await this.escribirArchivo(
       this.changelogPath + `db-changelog-XXX.xml`,
       createChangelogFile(this)
     );
-    this.escribirArchivo(
+    await this.escribirArchivo(
       this.dtoPath + `${this.NombreClase}Dto.java`,
       createDtoFile(this)
     );
-    createInterfaceServiceFile(this);
-    createModelFile(this);
-    createDtoFile(this);
-    createChangelogFile(this);
-    createPrimefacesFiles(this);
-    createServiceMapperFile(this);
-    createServiceFile(this);
-    createTablaSQLFile(this);
+    await this.escribirArchivo(
+      this.interfaceServicePath + `I${this.NombreClase}Service.java`,
+      createInterfaceServiceFile(this)
+    );
+    await this.escribirArchivo(
+      this.interfaceServicePath + `I${this.NombreClase}Service.java`,
+      createInterfaceServiceFile(this)
+    );
+    await this.escribirArchivo(
+      this.modelPath + `${this.NombreClase}.java`,
+      createModelFile(this)
+    );
+    createPrimefacesFiles(this).forEach(async (p) => {
+      await this.escribirArchivo(this.primefacesPath, p);
+    });
+    await this.escribirArchivo(
+      this.servicePath + `${this.NombreClase}Service.java`,
+      createServiceFile(this)
+    );
+    await this.escribirArchivo(
+      this.serviceMapperPath + this.NombreClase + "ServiceMapper.java",
+      createServiceMapperFile(this)
+    );
+    await this.escribirArchivo(
+      this.sqlPath + `db-changelog-XXX.sql`,
+      createTablaSQLFile(this)
+    );
     console.log("Terminado");
   }
 
   async escribirArchivo(path, contents) {
     try {
-      await writeTextFile(path, contents);
-      alert("Archivo guardado correctamente.");
+      console.log("escribir:  ", path);
+      const file = await create(path);
+      await file.write(new TextEncoder().encode(contents));
+      await file.close();
     } catch (err) {
       console.error("Error al escribir archivo:", err);
-      alert("Hubo un error al guardar el archivo.");
     }
   }
 }

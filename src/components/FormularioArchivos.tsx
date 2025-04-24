@@ -1,39 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { RootPathInput } from "./RootPathInput";
 import { ClassNameInput } from "./ClassNameInput";
 import { AttributeList } from "./AttributeList";
-
-const { electronAPI } = window as any;
-
-interface Attribute {
-  type: string;
-  name: string;
-  nullable: boolean;
-  relacion: string;
-}
+import { MyContext } from '../Context';
 
 export const FormularioArchivos: React.FC = () => {
-  const [className, setClassName] = useState("");
-  const [rootPath, setRootPath] = useState("");
-  const [test, setTest] = useState(false);
-  const [attributes, setAttributes] = useState<Attribute[]>([{ type: "", name: "", nullable: false, relacion: "" }]);
-
-  useEffect(() => {
-    if (electronAPI) {
-      electronAPI.receiveRootPath((event: any, path: string) => {
-        setRootPath(path);
-      });
-    }
-  }, []);
+  const { attributes,setAttributes,test,setTest,rootPath,setRootPath ,className,setClassName,crearArchivos} = useContext(MyContext);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log({ className, attributes, test });
-    electronAPI?.crearArchivos({
-      NombreClase: className,
-      atributos: attributes,
-      test,
-    });
+    e.preventDefault()
+    crearArchivos();
   };
 
   return (

@@ -61,12 +61,4 @@ ${atributos
 }
 
 `;
-
-  fs.writeFile(dtoPath + `${NombreClase}Dto.java`, dtoContent, (err) => {
-    if (err) {
-      console.error("Error al escribir el archivo:", err);
-    } else {
-      console.log("Archivo escrito correctamente");
-    }
-  });
 }

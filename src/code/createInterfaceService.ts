@@ -1,6 +1,4 @@
-const fs = require("fs");
-
-function createInterfaceServiceFile(abm) {
+export default function createInterfaceServiceFile(abm) {
   const { NombreClase, interfaceServicePath } = abm;
   const interfaceServiceContent = `package ar.com.mbsoft.erp.service;
 import ar.com.mbsoft.erp.dto.impl.generated.${NombreClase}Dto; 
@@ -25,13 +23,5 @@ public interface I${NombreClase}Service extends IService<${NombreClase}, ${Nombr
     List<${NombreClase}Dto> findAllDtoByNombre(String value);
 }
 `;
-
-  fs.writeFile(interfaceServicePath + `I${NombreClase}Service.java`, interfaceServiceContent, (err) => {
-    if (err) {
-      console.error("Error al escribir el archivo:", err);
-    } else {
-      console.log("Archivo escrito correctamente");
-    }
-  });
+  return interfaceServiceContent;
 }
-module.exports = { createInterfaceServiceFile };

@@ -1,7 +1,4 @@
-const fs = require("fs");
-const { primefacesPath, test } = require("./utils");
-
-function createPrimefacesFiles(abm) {
+export default function createPrimefacesFiles(abm) {
   const { nombreClase, NombreClase, primefacesPath } = abm;
   const abmContent = `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"
@@ -26,21 +23,6 @@ function createPrimefacesFiles(abm) {
 
 `;
 
-  fs.mkdir(primefacesPath, { recursive: true }, (err) => {
-    if (err && !test) {
-      console.error("Error al crear la carpeta:", err);
-    } else {
-      // Una vez creada la carpeta, escribir el archivo
-      fs.writeFile(primefacesPath + `abm.xhtml`, abmContent, (err) => {
-        if (err) {
-          console.error("Error al escribir el archivo:", err);
-        } else {
-          console.log("Archivo escrito correctamente");
-        }
-      });
-    }
-  });
-
   const listaContent = `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://java.sun.com/jsf/facelets"
@@ -60,22 +42,6 @@ function createPrimefacesFiles(abm) {
 </html>
 
 `;
-
-  fs.mkdir(primefacesPath, { recursive: true }, (err) => {
-    if (err && !test) {
-      console.error("Error al crear la carpeta:", err);
-    } else {
-      // Una vez creada la carpeta, escribir el archivo
-      fs.writeFile(primefacesPath + `lista.xhtml`, listaContent, (err) => {
-        if (err) {
-          console.error("Error al escribir el archivo:", err);
-        } else {
-          console.log("Archivo escrito correctamente");
-        }
-      });
-    }
-  });
-
   const propiedadesContent = `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
@@ -91,19 +57,5 @@ function createPrimefacesFiles(abm) {
 
 `;
 
-  fs.mkdir(primefacesPath, { recursive: true }, (err) => {
-    if (err && !test) {
-      console.error("Error al crear la carpeta:", err);
-    } else {
-      // Una vez creada la carpeta, escribir el archivo
-      fs.writeFile(primefacesPath + `propiedades.xhtml`, propiedadesContent, (err) => {
-        if (err) {
-          console.error("Error al escribir el archivo:", err);
-        } else {
-          console.log("Archivo escrito correctamente");
-        }
-      });
-    }
-  });
+  return [abmContent, listaContent, propiedadesContent];
 }
-module.exports = { createPrimefacesFiles };

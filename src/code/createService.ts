@@ -1,6 +1,4 @@
-const fs = require("fs");
-
-function createServiceFile(abm) {
+export default function createServiceFile(abm) {
   const { nombreClase, NombreClase, atributos, servicePath } = abm;
   const serviceContent = `package ar.com.mbsoft.erp.service.impl;
 
@@ -64,13 +62,5 @@ public class ${NombreClase}Service extends AbstractService<${NombreClase}, ${Nom
 
 
 `;
-
-  fs.writeFile(servicePath + `${NombreClase}Service.java`, serviceContent, (err) => {
-    if (err) {
-      console.error("Error al escribir el archivo:", err);
-    } else {
-      console.log("Archivo escrito correctamente");
-    }
-  });
+  return serviceContent;
 }
-module.exports = { createServiceFile };
