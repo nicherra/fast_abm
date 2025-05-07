@@ -40,7 +40,7 @@ export const MyContextProvider = ({ children }) => {
   const crearArchivos = async () => {
     console.log("rootpaht: ", rootPath);
     const creadorABM = new CreadorABM(rootPath, className, test, attributes);
-    console.log(creadorABM);
+    await creadorABM.init();
     creadorABM.crearArchivos();
   };
 

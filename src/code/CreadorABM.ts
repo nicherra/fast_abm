@@ -7,8 +7,14 @@ import createTablaSQLFile from "./createTablaSQL";
 import createPrimefacesFiles from "./createPrimeFaces";
 import createServiceFile from "./createService";
 import createInterfaceServiceFile from "./createInterfaceService";
-import { writeTextFile, BaseDirectory, create } from "@tauri-apps/plugin-fs";
+import {
+  writeTextFile,
+  BaseDirectory,
+  create,
+  mkdir,
+} from "@tauri-apps/plugin-fs";
 import { debug, info } from "@tauri-apps/plugin-log";
+import { desktopDir, homeDir } from "@tauri-apps/api/path";
 
 export default class CreadorABM {
   NombreClase;
@@ -34,6 +40,7 @@ export default class CreadorABM {
   dtoPath;
   creadoABM: CreadorABM;
   pathTest;
+  desktopPath;
 
   constructor(rootPath, NombreClase, test, atributos) {
     this.pathTest = "";
@@ -41,7 +48,6 @@ export default class CreadorABM {
     this.NombreClase = NombreClase; // string
     this.test = test; // boGolean
     this.atributos = atributos; // array
-    this.username = "nicherra"; //locale.toString();
     this.nombreClase =
       NombreClase.charAt(0).toLowerCase() + NombreClase.slice(1);
     this.dtoPath =
@@ -114,6 +120,11 @@ export default class CreadorABM {
     this.decimales = ["BigDecimal", "float", "Float", "double", "Double"];
     this.tiposTiempo = ["Date", "LocalDate", "LocalTime", "LocalDateTime"];
     this.creadoABM = this;
+  }
+  async init() {
+    const { desktopDir } = await import("@tauri-apps/api/path");
+    this.desktopPath = (await desktopDir()) + "\\fast_abm_test\\";
+    return this;
   }
 
   capitalize(str) {
@@ -265,10 +276,19 @@ export default class CreadorABM {
 
   async escribirArchivo(path, contents) {
     try {
-      console.log("escribir:  ", path);
-      const file = await create(path);
-      await file.write(new TextEncoder().encode(contents));
-      await file.close();
+      if (this.test) {
+        await mkdir(this.desktopPath, {
+          recursive: true,
+        });
+        const nombreArchivo = path.split(/[/\\]/).pop();
+        const file = await create(this.desktopPath + nombreArchivo);
+        await file.write(new TextEncoder().encode(contents));
+        await file.close();
+      } else {
+        const file = await create(path);
+        await file.write(new TextEncoder().encode(contents));
+        await file.close();
+      }
     } catch (err) {
       console.error("Error al escribir archivo:", err);
     }
