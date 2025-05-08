@@ -257,8 +257,12 @@ export default class CreadorABM {
       this.modelPath + `${this.NombreClase}.java`,
       createModelFile(this)
     );
-    createPrimefacesFiles(this).forEach(async (p) => {
-      await this.escribirArchivo(this.primefacesPath, p);
+    createPrimefacesFiles(this).forEach(async (p, i) => {
+      let nombreArchivo = "";
+      if (i === 0) nombreArchivo = "abm.xhtml";
+      if (i === 1) nombreArchivo = "lista.xhtml";
+      if (i === 2) nombreArchivo = "propiedades.xhtml";
+      await this.escribirArchivo(this.primefacesPath + nombreArchivo, p);
     });
     await this.escribirArchivo(
       this.servicePath + `${this.NombreClase}Service.java`,
