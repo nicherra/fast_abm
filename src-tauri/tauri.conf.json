@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "tauri-app",
+        "title": "FastABM",
         "width": 1000,
         "height": 700
       }
