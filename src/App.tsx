@@ -1,7 +1,8 @@
 import { FormularioArchivos } from "./components/FormularioArchivos";
+import "./App.css";
 
 const App = () => (
-  <div style={{ padding: "2em", margin: "3em" }}>
+  <div>
     <h3>Code Generator</h3>
     <FormularioArchivos />
   </div>

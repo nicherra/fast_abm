@@ -39,6 +39,18 @@ export const MyContextProvider = ({ children }) => {
 
   const crearArchivos = async () => {
     console.log("rootpaht: ", rootPath);
+    if (!rootPath) {
+      alert("No esta definido el path");
+      return;
+    }
+    if (!className || className === "") {
+      alert("No esta definido el nombre de la Clase");
+      return;
+    }
+    if (!attributes || attributes.length == 0) {
+      alert("No hay atributos definidos");
+      return;
+    }
     const creadorABM = new CreadorABM(rootPath, className, test, attributes);
     await creadorABM.init();
     creadorABM.crearArchivos();

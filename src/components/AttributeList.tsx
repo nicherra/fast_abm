@@ -13,7 +13,10 @@ interface Props {
   setAttributes: (list: Attribute[]) => void;
 }
 
-export const AttributeList: React.FC<Props> = ({ attributes, setAttributes }) => {
+export const AttributeList: React.FC<Props> = ({
+  attributes,
+  setAttributes,
+}) => {
   const updateAttribute = (index: number, updated: Attribute) => {
     const copy = [...attributes];
     copy[index] = updated;
@@ -21,7 +24,10 @@ export const AttributeList: React.FC<Props> = ({ attributes, setAttributes }) =>
   };
 
   const addAttribute = () => {
-    setAttributes([...attributes, { type: "", name: "", nullable: false, relacion: "" }]);
+    setAttributes([
+      ...attributes,
+      { type: "", name: "", nullable: false, relacion: "" },
+    ]);
   };
 
   const removeAttribute = (index: number) => {

@@ -42,7 +42,14 @@ const tipos = [
   "LocalDateTime",
 ];
 
-export const AttributeRow: React.FC<Props> = ({ attribute, onChange, onRemove, isLast, onAdd, showRemove }) => {
+export const AttributeRow: React.FC<Props> = ({
+  attribute,
+  onChange,
+  onRemove,
+  isLast,
+  onAdd,
+  showRemove,
+}) => {
   const handleChange = (field: keyof Attribute, value: string | boolean) => {
     onChange({ ...attribute, [field]: value });
   };
@@ -50,30 +57,39 @@ export const AttributeRow: React.FC<Props> = ({ attribute, onChange, onRemove, i
   const showRelacion = attribute.type && !tipos.includes(attribute.type);
 
   return (
-    <article className="fila" style={{ display: "flex", marginTop: "1em" }}>
-      <label>Tipo</label>
-      <input
-        list="typeList"
-        className="tipo"
-        value={attribute.type}
-        placeholder="String.."
-        onChange={(e) => handleChange("type", e.target.value)}
-      />
-      <label style={{ marginLeft: "2em" }}>Nombre campo</label>
-      <input
-        className="nombreCampo"
-        type="text"
-        value={attribute.name}
-        placeholder="nombreApellido.."
-        onChange={(e) => handleChange("name", e.target.value)}
-      />
-      <label style={{ marginLeft: "2em" }}>Nullable</label>
-      <input
-        type="checkbox"
-        className="nullable"
-        checked={attribute.nullable}
-        onChange={(e) => handleChange("nullable", e.target.checked)}
-      />
+    <article
+      className="fila"
+      style={{ display: "flex", gap: "3.5em", marginTop: "1em" }}
+    >
+      <div>
+        <label>Tipo</label>
+        <input
+          list="typeList"
+          className="tipo"
+          value={attribute.type}
+          placeholder="String.."
+          onChange={(e) => handleChange("type", e.target.value)}
+        />
+      </div>
+      <div>
+        <label>Nombre campo</label>
+        <input
+          className="nombreCampo"
+          type="text"
+          value={attribute.name}
+          placeholder="nombreApellido.."
+          onChange={(e) => handleChange("name", e.target.value)}
+        />
+      </div>
+      <div>
+        <label>Nullable</label>
+        <input
+          type="checkbox"
+          className="nullable"
+          checked={attribute.nullable}
+          onChange={(e) => handleChange("nullable", e.target.checked)}
+        />
+      </div>
       {showRelacion && (
         <span className="relacionContainer" style={{ marginLeft: "2em" }}>
           <label>Relación</label>
@@ -87,12 +103,12 @@ export const AttributeRow: React.FC<Props> = ({ attribute, onChange, onRemove, i
         </span>
       )}
       {isLast && (
-        <button type="button" style={{ marginLeft: "5em" }} className="botonNuevo" onClick={onAdd}>
+        <button type="button" className="botonNuevo" onClick={onAdd}>
           + Nuevo Campo
         </button>
       )}
       {showRemove && (
-        <button type="button" style={{ marginLeft: "1em" }} className="botonBorrar" onClick={onRemove}>
+        <button type="button" className="botonBorrar" onClick={onRemove}>
           - Borrar Campo
         </button>
       )}
