@@ -1,5 +1,5 @@
 export default function createBeanFile(abm) {
-  const { NombreClase, nombreClase, beanPath } = abm;
+  const { NombreClase, nombreClase } = abm;
 
   const beanContent = `package ar.com.mbsoft.erp.bean.impl;
 

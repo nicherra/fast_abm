@@ -1,5 +1,5 @@
 export default function createServiceFile(abm) {
-  const { nombreClase, NombreClase, atributos, servicePath } = abm;
+  const { nombreClase, NombreClase } = abm;
   const serviceContent = `package ar.com.mbsoft.erp.service.impl;
 
 import ar.com.mbsoft.erp.dao.I${NombreClase}Dao;
@@ -40,11 +40,6 @@ public class ${NombreClase}Service extends AbstractService<${NombreClase}, ${Nom
     }
 
     @Override
-    public ${NombreClase}Dto findOneDtoByNombre(String value) {
-        return ${nombreClase}ServiceMapper.createDto(${nombreClase}Dao.findOneByNombre(value));
-    }
-
-    @Override
     public ${NombreClase}Dto findOneDtoById(Long id) {
         return ${nombreClase}ServiceMapper.createDto(${nombreClase}Dao.findOneById(id));
     }
@@ -52,11 +47,6 @@ public class ${NombreClase}Service extends AbstractService<${NombreClase}, ${Nom
     @Override
     public List<${NombreClase}Dto> findAllDto() {
         return toDtoList(${nombreClase}Dao.findAll(), ${nombreClase}ServiceMapper::createDto);
-    }
-
-    @Override
-    public List<${NombreClase}Dto> findAllDtoByNombre(String value) {
-        return toDtoList(${nombreClase}Dao.findAllByLikeNombre(value), ${nombreClase}ServiceMapper::createDto);
     }
 }
 

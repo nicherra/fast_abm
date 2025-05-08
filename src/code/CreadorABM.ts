@@ -7,14 +7,8 @@ import createTablaSQLFile from "./createTablaSQL";
 import createPrimefacesFiles from "./createPrimeFaces";
 import createServiceFile from "./createService";
 import createInterfaceServiceFile from "./createInterfaceService";
-import {
-  writeTextFile,
-  BaseDirectory,
-  create,
-  mkdir,
-} from "@tauri-apps/plugin-fs";
-import { debug, info } from "@tauri-apps/plugin-log";
-import { desktopDir, homeDir } from "@tauri-apps/api/path";
+import { create, mkdir, open } from "@tauri-apps/plugin-fs";
+import createDaoFile from "./createDao";
 
 export default class CreadorABM {
   NombreClase;
@@ -40,7 +34,9 @@ export default class CreadorABM {
   dtoPath;
   creadoABM: CreadorABM;
   pathTest;
+  daoPath;
   desktopPath;
+  messagePropertiesPath;
 
   constructor(rootPath, NombreClase, test, atributos) {
     this.pathTest = "";
@@ -66,6 +62,9 @@ export default class CreadorABM {
       this.rootPath + "src/main/java/ar/com/mbsoft/erp/service/";
     this.beanPath =
       this.rootPath + "src/main/java/ar/com/mbsoft/erp/bean/impl/";
+    this.daoPath = this.rootPath + "src/main/java/ar/com/mbsoft/erp/dao/";
+    this.messagePropertiesPath =
+      this.rootPath + "resources/messages.properties";
     this.tiposUsados = [
       "BigDecimal",
       "String",
@@ -186,7 +185,7 @@ export default class CreadorABM {
       .map((a) => {
         return `    public void set${this.capitalize(a.name)}(${a.type} ${
           a.name
-        }) { return this.${a.name} = ${a.name};}`;
+        }) { this.${a.name} = ${a.name};}`;
       })
       .join("\n");
   }
@@ -231,6 +230,12 @@ export default class CreadorABM {
       "\n"
     );
   }
+
+  isStringOrNumberOrDate(atributo) {
+    console.log("isStringOrNumberOrDate");
+    return this.tiposUsados.includes(atributo.type);
+  }
+
   async crearArchivos() {
     console.log("creandoArchivos.....");
     await this.escribirArchivo(
@@ -259,8 +264,11 @@ export default class CreadorABM {
     );
     createPrimefacesFiles(this).forEach(async (p, i) => {
       let nombreArchivo = "";
+      await mkdir(this.primefacesPath, {
+        recursive: true,
+      });
       if (i === 0) nombreArchivo = "abm.xhtml";
-      if (i === 1) nombreArchivo = "lista.xhtml";
+      if (i === 1) nombreArchivo = "listar.xhtml";
       if (i === 2) nombreArchivo = "propiedades.xhtml";
       await this.escribirArchivo(this.primefacesPath + nombreArchivo, p);
     });
@@ -276,11 +284,41 @@ export default class CreadorABM {
       this.sqlPath + `db-changelog-XXX.sql`,
       createTablaSQLFile(this)
     );
+    await this.escribirArchivo(
+      this.daoPath + "I" + this.NombreClase + "Dao.java",
+      createDaoFile(this)
+    );
+    await this.escribirArchivo(
+      this.messagePropertiesPath,
+      `
+#${this.NombreClase}
+faces.${this.nombreClase}.title=${this.NombreClase}
+${this.atributos
+  .map((a) => {
+    return `faces.${this.nombreClase}.${a.name}=${this.convertirCampo(a.name)}`;
+  })
+  .join("\n")}
+      `
+    );
     console.log("Terminado");
+  }
+
+  convertirCampo(campo: string): string {
+    // Reemplaza camelCase o snake_case por espacios y capitaliza cada palabra
+    return campo
+      .replace(/([a-z])([A-Z])/g, "$1 $2") // camelCase → espacio antes de mayúsculas
+      .replace(/_/g, " ") // snake_case → espacios
+      .replace(/\b\w/g, (letra) => letra.toUpperCase()); // Capitaliza cada palabra
   }
 
   async escribirArchivo(path, contents) {
     try {
+      if (path === this.messagePropertiesPath) {
+        const file = await open(path, { append: true });
+        await file.write(new TextEncoder().encode(contents));
+        await file.close();
+        return;
+      }
       if (this.test) {
         await mkdir(this.desktopPath, {
           recursive: true,

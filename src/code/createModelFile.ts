@@ -1,12 +1,12 @@
 export default function createModelFile(abm) {
-  const { getters, setters, modelPath, atributos, NombreClase } = abm;
+  const { atributos, NombreClase } = abm;
   console.log("createModelFile");
   const modelContent = `package ar.com.mbsoft.erp.model.impl;
 
 import ar.com.mbsoft.erp.annotations.MBSecurity;
 import javax.persistence.*;
+import java.util.*;
 import javax.validation.constraints.NotNull;
-import java.util.Objects;
 
 @Entity
 @MBSecurity

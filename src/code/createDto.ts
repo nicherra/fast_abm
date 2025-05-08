@@ -1,5 +1,5 @@
 export default function createDtoFile(abm) {
-  const { NombreClase, dtoPath, nombreClase, atributos } = abm;
+  const { NombreClase, atributos } = abm;
   const dtoContent = `package ar.com.mbsoft.erp.dto.impl.generated;
 import ar.com.mbsoft.erp.dto.IDto;
 import java.math.BigDecimal;
@@ -40,7 +40,7 @@ ${atributos
       " " +
       a.name +
       ")" +
-      " { return this." +
+      " { this." +
       a.name +
       " = " +
       a.name +

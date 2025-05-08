@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "tauri-app",
+  "productName": "FastABM",
   "version": "0.1.0",
   "identifier": "com.tauri-app.app",
   "build": {
@@ -13,8 +13,8 @@
     "windows": [
       {
         "title": "tauri-app",
-        "width": 800,
-        "height": 600
+        "width": 1000,
+        "height": 700
       }
     ],
     "security": {

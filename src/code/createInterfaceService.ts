@@ -1,5 +1,5 @@
 export default function createInterfaceServiceFile(abm) {
-  const { NombreClase, interfaceServicePath } = abm;
+  const { NombreClase } = abm;
   const interfaceServiceContent = `package ar.com.mbsoft.erp.service;
 import ar.com.mbsoft.erp.dto.impl.generated.${NombreClase}Dto; 
 import ar.com.mbsoft.erp.exception.impl.BusinessException;
@@ -15,12 +15,8 @@ public interface I${NombreClase}Service extends IService<${NombreClase}, ${Nombr
 
     List<${NombreClase}Dto> findAllDto();
 
-    ${NombreClase}Dto findOneDtoByNombre(String value);
-
     @Override
     ${NombreClase}Dto findOneDtoById(Long id);
-
-    List<${NombreClase}Dto> findAllDtoByNombre(String value);
 }
 `;
   return interfaceServiceContent;

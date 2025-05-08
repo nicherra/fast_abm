@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useContext } from "react";
 import { RootPathInput } from "./RootPathInput";
 import { ClassNameInput } from "./ClassNameInput";
 import { AttributeList } from "./AttributeList";

@@ -8,7 +8,6 @@ export default function createTablaSQLFile(abm: CreadorABM) {
     nID BIGINT IDENTITY (1, 1) NOT NULL,
 	nIDUsuario VARCHAR(255) NOT NULL,
 	nVersion bigint NOT NULL,
-	observacion VARCHAR(max) NOT NULL,
 
 ${atributos
   .map((a, i) => {
