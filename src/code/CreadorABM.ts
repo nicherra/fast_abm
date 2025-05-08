@@ -128,6 +128,7 @@ export default class CreadorABM {
   }
 
   capitalize(str) {
+    console.log("capitalize ", str);
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
@@ -195,7 +196,7 @@ export default class CreadorABM {
   }
 
   nombreCampoTabla(atributo): string {
-    console.log("nameFieldTabla \n", atributo);
+    console.log("nameFieldTabla ", atributo);
     let inicial = "nID";
     if (this.tiposNumericos.includes(atributo.type)) inicial = "n";
     if (atributo.type === "String") inicial = "c";

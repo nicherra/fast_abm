@@ -61,4 +61,5 @@ ${atributos
 }
 
 `;
+  return dtoContent;
 }
